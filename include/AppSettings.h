@@ -23,6 +23,8 @@ struct ApplicationSettingsStorage
 	IPAddress netmask;
 	IPAddress gateway;
 
+	String mqttServer;
+
 	void load()
 	{
 		DynamicJsonBuffer jsonBuffer;
@@ -42,6 +44,8 @@ struct ApplicationSettingsStorage
 			ip = network["ip"].toString();
 			netmask = network["netmask"].toString();
 			gateway = network["gateway"].toString();
+
+			mqttServer = network["mqttServer"].toString();
 
 			delete[] jsonString;
 		}
@@ -66,6 +70,8 @@ struct ApplicationSettingsStorage
 		network["ip"] = strip;
 		network["netmask"] = strn;
 		network["gateway"] = strg;
+
+		network["mqttServer"] = mqttServer;
 
 		char buf[3048];
 		root.prettyPrintTo(buf, sizeof(buf)); //TODO: add file stream writing

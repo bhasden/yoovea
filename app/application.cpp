@@ -2,12 +2,14 @@
 #include <SmingCore/SmingCore.h>
 #include <AppSettings.h>
 #include <Mqtt.h>
+#include <Ntp.h>
+#include <Schedule.h>
 #include <Wifi.h>
 
 // Will be called when system initialization was completed
-void startServers()
+void startUp()
 {
-	Mqtt.start();
+	//Mqtt.start();
 	//startWebServer();
 }
 
@@ -18,5 +20,5 @@ void init()
 	AppSettings.load();
 
 	// Run servers on system ready
-	//System.onReady(startServers);
+	System.onReady(startUp);
 }

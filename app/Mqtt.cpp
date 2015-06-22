@@ -30,7 +30,7 @@ void connectOk()
 {
 	Serial.println("Mqtt connected");
 
-	client = MqttClient("test.mosquitto.org", 1883, onMessageReceived);
+	client = MqttClient(AppSettings.mqttServer, 1883, onMessageReceived);
 
 	// Run MQTT client
 	client.connect("esp8266");
@@ -62,4 +62,6 @@ void MqttClass::start()
 void MqttClass::onSystemReady()
 {
 	debugf("System ready (mqtt)...");
+
+	AppSettings.load();
 }
