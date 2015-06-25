@@ -1,7 +1,9 @@
 #include <user_config.h>
 #include <SmingCore/SmingCore.h>
+#include <AppSettings.h>
 #include <AutoUpdate.h>
 
+HttpClient httpClient;
 HttpFirmwareUpdate airUpdater;
 Timer procTimer;
 String updateUrl;
@@ -12,24 +14,77 @@ AutoUpdateClass::AutoUpdateClass(String url)
 	System.onReady(this);
 }
 
+void onRequestSent(HttpClient& client, bool successful)
+{
+	if (successful)
+	{
+		debugf("Update check successful.");
+
+		StaticJsonBuffer<200> jsonBuffer;
+
+		String response = client.getResponseString();
+		char json[response.length()+1];//as 1 char space for null is also required
+		strcpy(json, response.c_str());
+		JsonObject& root = jsonBuffer.parseObject(json);
+
+		if (root != root.invalid())
+		{
+			const char* version = root["version"];
+
+			if (strcmp(version, AppSettings.version.c_str()) == 0)
+			{
+				debugf("No new version available.");
+			}
+			else
+			{
+				debugf("New version available. Staging files...");
+
+				JsonArray& files = root["files"];
+
+				for (int i = 0; i < 10; i++)
+				{
+					JsonObject& file = files[i];
+
+					if (file == file.invalid())
+						break; // We're at the end of the file list
+
+					int address = file["address"];
+					const char* url = file["url"];
+
+					// Configure cloud update
+					airUpdater.addItem(address, url);
+
+					debugf("String file %i from %s.", address, url);
+				}
+
+				debugf("Update files staged. Starting update...");
+				airUpdater.start();
+			}
+		}
+	}
+	else
+	{
+		debugf("Update check failed.");
+	}
+}
+
 void update()
 {
-	// Configure cloud update
-	airUpdater.addItem(0x0000, "https://www.yoovea.com/firmware/v0/eagle.flash.bin");
-	airUpdater.addItem(0x9000, "https://www.yoovea.com/firmware/v0/eagle.irom0text.bin");
+	debugf("Requesting update information...");
 
-	Serial.println("Starting update...");
-	airUpdater.start();
+	httpClient.downloadString("http://api.yoovea.com/firmware?v=latest", onRequestSent);
 }
 
 void AutoUpdateClass::start()
 {
 	debugf("Starting autoUpdate...");
 
-	procTimer.initializeMs(1000, update).start();
+	procTimer.initializeMs(86400000, update).start(); // 24 hours
 }
 
 void AutoUpdateClass::onSystemReady()
 {
 	debugf("System ready (autoUpdate)...");
+
+	AppSettings.load();
 }

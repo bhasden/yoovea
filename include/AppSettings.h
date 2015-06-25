@@ -14,8 +14,8 @@
 
 struct ApplicationSettingsStorage
 {
-	String ssid;
 	String password;
+	String ssid;
 
 	bool dhcp = true;
 
@@ -24,6 +24,8 @@ struct ApplicationSettingsStorage
 	IPAddress gateway;
 
 	String mqttServer;
+
+	String version = "v0.1";
 
 	void load()
 	{
@@ -36,8 +38,8 @@ struct ApplicationSettingsStorage
 			JsonObject& root = jsonBuffer.parseObject(jsonString);
 
 			JsonObject& network = root["network"];
-			ssid = network["ssid"].toString();
 			password = network["password"].toString();
+			ssid = network["ssid"].toString();
 
 			dhcp = network["dhcp"];
 
@@ -58,8 +60,8 @@ struct ApplicationSettingsStorage
 
 		JsonObject& network = jsonBuffer.createObject();
 		root["network"] = network;
-		network["ssid"] = ssid;
 		network["password"] = password;
+		network["ssid"] = ssid;
 
 		network["dhcp"] = dhcp;
 

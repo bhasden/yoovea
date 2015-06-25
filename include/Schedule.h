@@ -20,7 +20,7 @@ private:
 class ControllerSchedule
 {
 public:
-	time_t date;
+	DateTime date;
 	Vector<ZoneSchedule> zones;
 
 	ControllerSchedule() : date(0) {};
@@ -38,7 +38,7 @@ public:
 	ControllerSchedule current;
 	ControllerSchedule next;
 
-	ScheduleClass() {};
+	ScheduleClass();
 	~ScheduleClass() {}
 
 protected:
