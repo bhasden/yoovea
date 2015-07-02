@@ -14,7 +14,6 @@ MqttClient client = MqttClient("localhost", 1883, onMessageReceived);
 MqttClass::MqttClass()
 {
 	System.onReady(this);
-	onSystemReady();
 }
 
 // Will be called when WiFi station timeout was reached

@@ -13,7 +13,7 @@ protected:
 	virtual void onSystemReady();
 
 private:
-	//softap_config* runConfig;
+
 };
 
 extern MqttClass Mqtt;

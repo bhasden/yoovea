@@ -35,11 +35,13 @@ private:
 class ScheduleClass : protected ISystemReadyHandler
 {
 public:
-	ControllerSchedule current;
-	ControllerSchedule next;
+	ControllerSchedule currentSchedule;
+	ControllerSchedule nextSchedule;
 
 	ScheduleClass();
 	~ScheduleClass() {}
+
+	void checkSchedule();
 
 protected:
 	virtual void onSystemReady();

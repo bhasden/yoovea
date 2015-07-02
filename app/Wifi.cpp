@@ -94,7 +94,7 @@ void onAjaxNetworkList(HttpRequest &request, HttpResponse &response)
 	if (connected)
 	{
 		currentNetwork = WifiStation.getSSID();
-		json["network"] = currentNetwork;
+		json["network"] = currentNetwork.c_str();
 	}
 
 	JsonArray& netlist = json.createNestedArray("available");
@@ -104,7 +104,7 @@ void onAjaxNetworkList(HttpRequest &request, HttpResponse &response)
 		JsonObject &item = netlist.createNestedObject();
 		//debugf("%s %s", test.c_str(), networks[i].ssid.c_str());
 		item.add("id", (int)networks[i].getHashId());
-		item.add("title", networks[i].ssid);
+		item.add("title", networks[i].ssid.c_str());
 		item.add("signal", networks[i].rssi);
 		item.add("encryption", networks[i].getAuthorizationMethodName());
 	}

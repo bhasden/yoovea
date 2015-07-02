@@ -23,7 +23,13 @@ struct ApplicationSettingsStorage
 	IPAddress netmask;
 	IPAddress gateway;
 
-	String mqttServer;
+	String mqttServer = "mqtt.yoovea.com";
+
+    int clearPin = 4;
+	int clockPin = 16;
+	int dataPin = 13;
+	int enablePin = 12;
+	int latchPin = 14;
 
 	String version = "v0.1";
 
@@ -60,20 +66,17 @@ struct ApplicationSettingsStorage
 
 		JsonObject& network = jsonBuffer.createObject();
 		root["network"] = network;
-		network["password"] = password;
-		network["ssid"] = ssid;
+		network["ssid"] = ssid.c_str();
+		network["password"] = password.c_str();
 
 		network["dhcp"] = dhcp;
 
-		// Temporary string variables to save reference
-		String strip = ip.toString();
-		String strn = netmask.toString();
-		String strg = gateway.toString();
-		network["ip"] = strip;
-		network["netmask"] = strn;
-		network["gateway"] = strg;
+		// Make copy by value for temporary string objects
+		network.addCopy("ip", ip.toString());
+		network.addCopy("netmask", netmask.toString());
+		network.addCopy("gateway", gateway.toString());
 
-		network["mqttServer"] = mqttServer;
+		network.addCopy("mqttServer", mqttServer);
 
 		char buf[3048];
 		root.prettyPrintTo(buf, sizeof(buf)); //TODO: add file stream writing
