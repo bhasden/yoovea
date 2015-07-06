@@ -3,13 +3,12 @@
 #include <AppSettings.h>
 #include <Mqtt.h>
 
-void onMessageReceived(String topic, String message); // Forward declaration for our callback
+void connectFail();
+void connectOk();
+void onMessageReceived(String topic, String message);
 
-Timer procTimer;
-
-// MQTT client
-// For quickly check you can use: http://www.hivemq.com/demos/websocket-client/ (Connection= test.mosquitto.org:8080)
 MqttClient client = MqttClient("localhost", 1883, onMessageReceived);
+Timer procTimer;
 
 MqttClass::MqttClass()
 {
@@ -19,9 +18,8 @@ MqttClass::MqttClass()
 // Will be called when WiFi station timeout was reached
 void connectFail()
 {
-	Serial.println("I'm NOT CONNECTED. Need help :(");
-
-	// .. some you code for device configuration ..
+	debugf("Wifi not connected (mqtt).");
+	WifiStation.waitConnection(connectOk, 30, connectFail); // Repeat and check again
 }
 
 // Will be called when WiFi station was connected to AP
@@ -55,7 +53,8 @@ void MqttClass::start()
 {
 	debugf("Starting mqtt...");
 
-	WifiStation.waitConnection(connectOk, 20, connectFail); // We recommend 20+ seconds for connection timeout at start
+	// Run our method when the station is connected to the AP (or not connected).
+	WifiStation.waitConnection(connectOk, 30, connectFail);
 }
 
 void MqttClass::onSystemReady()

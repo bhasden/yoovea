@@ -7,7 +7,7 @@ void connectFail();
 void connectOk();
 void onNtpReceive(NtpClient& client, time_t timestamp);
 
-NtpClient ntpClient("pool.ntp.org", 28800, onNtpReceive);
+NtpClient ntpClient("pool.ntp.org", 28800, onNtpReceive); // 8 hours
 
 NtpClass::NtpClass()
 {
@@ -16,16 +16,15 @@ NtpClass::NtpClass()
 
 void connectFail()
 {
-	debugf("Ntp not connected");
+	debugf("Wifi not connected (ntp).");
 	WifiStation.waitConnection(connectOk, 30, connectFail); // Repeat and check again
 }
 
-// Will be called when WiFi station was connected to AP
 void connectOk()
 {
-	Serial.println("Ntp connected");
+	Serial.println("Wifi connected. Configuring Ntp client.");
 
-	// Set client to do automatic time requests (configured in the constructor for an 8 hour interval).
+	// Set client to do automatic time requests.
 	ntpClient.setAutoQuery(true);
 	ntpClient.setAutoUpdateSystemClock(true);
 	// Request to update time now. Otherwise the set interval will pass before time is updated.
@@ -33,20 +32,19 @@ void connectOk()
 }
 
 void onNtpReceive(NtpClient& client, time_t timestamp) {
-	SystemClock.setTime(timestamp);
+	//SystemClock.setTime(timestamp); // May not need to explicitly set the system clock
 
-	Serial.print("Time synchronized: ");
-	Serial.println(SystemClock.getSystemTimeString());
+	debugf("Time synchronized: %s", SystemClock.getSystemTimeString().c_str());
 }
 
 void NtpClass::start()
 {
 	debugf("Starting ntp...");
 
-	// set timezone hourly difference to UTC
+	// Set timezone hourly difference to UTC.
 	SystemClock.setTimeZone(0);
 
-	// Run our method when station was connected to AP (or not connected)
+	// Run our method when the station is connected to the AP (or not connected).
 	WifiStation.waitConnection(connectOk, 30, connectFail);
 }
 

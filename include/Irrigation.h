@@ -8,6 +8,7 @@ public:
 	~IrrigationClass() {}
 
 	int currentZone;
+	DateTime startTime;
 
 	void turnOff();
 	void turnOn(int zone);

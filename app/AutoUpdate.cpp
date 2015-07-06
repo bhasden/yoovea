@@ -23,7 +23,7 @@ void onRequestSent(HttpClient& client, bool successful)
 		StaticJsonBuffer<200> jsonBuffer;
 
 		String response = client.getResponseString();
-		char json[response.length()+1];//as 1 char space for null is also required
+		char json[response.length() + 1];// Add 1 char space for null
 		strcpy(json, response.c_str());
 		JsonObject& root = jsonBuffer.parseObject(json);
 
@@ -54,7 +54,7 @@ void onRequestSent(HttpClient& client, bool successful)
 					// Configure cloud update
 					airUpdater.addItem(address, url);
 
-					debugf("String file %i from %s.", address, url);
+					debugf("Staging file %i from %s.", address, url);
 				}
 
 				debugf("Update files staged. Starting update...");

@@ -4,18 +4,39 @@
 #include <Irrigation.h>
 #include <Schedule.h>
 
-//ControllerSchedule nextSchedule;
-Timer timer;
+Timer scheduleTimer;
+Timer zoneTimer;
+int zoneScheduleIndex;
 
 ScheduleClass::ScheduleClass()
 {
 	System.onReady(this);
 }
 
-// Publish our message
-void ScheduleClass::checkSchedule()
+void ScheduleClass::changeZone()
 {
-	debugf("Checking whether it's time to turn on the sprinkler system");
+	zoneScheduleIndex++;
+	debugf("Changing to zone %d.", zoneScheduleIndex);
+
+	if (&currentSchedule != &currentSchedule.invalid() &&
+		zoneScheduleIndex < currentSchedule.zones.count())
+	{
+		ZoneSchedule nextZone = currentSchedule.zones[zoneScheduleIndex];
+
+		debugf("Running zone %s for %d minutes.", nextZone.name.c_str(), nextZone.runtime);
+		zoneTimer.initializeMs(nextZone.runtime * 1000, TimerDelegate(&ScheduleClass::changeZone, this)).startOnce();
+	}
+}
+
+void ScheduleClass::check()
+{
+	debugf("Checking whether it's time to turn on the sprinkler system.");
+
+	if (&nextSchedule == &nextSchedule.invalid())
+	{
+		debugf("No schedule available.");
+		return;
+	}
 
 	// The time to run the sprinkler system has passed
 	if (SystemClock.now().toUnixTime() > nextSchedule.date.toUnixTime())
@@ -23,26 +44,22 @@ void ScheduleClass::checkSchedule()
 		debugf("The next scheduled sprinkler runtime has passed.");
 
 		currentSchedule = nextSchedule;
-
-		for (int i = 0; i < currentSchedule.zones.count(); i++)
-		{
-			ZoneSchedule currentZone = currentSchedule.zones[i];
-
-			time_t nextZoneTime = SystemClock.now().toUnixTime() + (currentZone.runtime * 1000);
-
-			Irrigation.turnOn(currentZone.number);
-		}
+		zoneScheduleIndex = -1;
+		changeZone();
 	}
 }
 
-void timerElapsed()
+void ScheduleClass::clear()
 {
-	Schedule.checkSchedule();
+	debugf("Clearing schedule.");
+
+	currentSchedule = ControllerSchedule::invalid();
+	nextSchedule = ControllerSchedule::invalid();
 }
 
 void ScheduleClass::onSystemReady()
 {
 	debugf("System ready (schedule)...");
 
-	timer.initializeMs(300000, timerElapsed).start();
+	scheduleTimer.initializeMs(300000, TimerDelegate(&ScheduleClass::check, this)).start(); // 5 minutes
 }

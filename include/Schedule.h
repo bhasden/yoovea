@@ -26,25 +26,33 @@ public:
 	ControllerSchedule() : date(0) {};
 	~ControllerSchedule() {}
 
+	static ControllerSchedule &invalid() { return _invalid; }
+
 protected:
 
 private:
+	static ControllerSchedule _invalid;
 
 };
 
 class ScheduleClass : protected ISystemReadyHandler
 {
 public:
-	ControllerSchedule currentSchedule;
-	ControllerSchedule nextSchedule;
-
 	ScheduleClass();
 	~ScheduleClass() {}
 
-	void checkSchedule();
+	void check();
+	void clear();
 
 protected:
+	ControllerSchedule currentSchedule;
+	ControllerSchedule nextSchedule;
+
+	virtual void changeZone();
 	virtual void onSystemReady();
+
+private:
+
 };
 
 extern ScheduleClass Schedule;

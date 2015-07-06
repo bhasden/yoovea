@@ -78,9 +78,7 @@ struct ApplicationSettingsStorage
 
 		network.addCopy("mqttServer", mqttServer);
 
-		char buf[3048];
-		root.prettyPrintTo(buf, sizeof(buf)); //TODO: add file stream writing
-		fileSetContent(APP_SETTINGS_FILE, buf);
+		fileSetContent(APP_SETTINGS_FILE, root.toJsonString());
 	}
 
 	bool exist() { return fileExist(APP_SETTINGS_FILE); }

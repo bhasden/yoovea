@@ -1,5 +1,6 @@
 #include <user_config.h>
 #include <SmingCore/SmingCore.h>
+#include <SmingCore/SystemClock.h>
 #include <AppSettings.h>
 #include <Irrigation.h>
 
@@ -18,6 +19,7 @@ void IrrigationClass::turnOff()
 	digitalWrite(AppSettings.enablePin, HIGH);
 
 	currentZone = 0;
+	startTime = 0;
 }
 
 void IrrigationClass::turnOn(int zone)
@@ -47,6 +49,7 @@ void IrrigationClass::turnOn(int zone)
     // Make it so
     digitalWrite(AppSettings.latchPin, HIGH);
     currentZone = zone;
+    startTime = SystemClock.now();
 }
 
 void IrrigationClass::onSystemReady()
